@@ -154,18 +154,15 @@
 
   function calcularTotal() {
     const valorMetro = parseFloat(document.getElementById("valorMetro").value);
+    const area = parseFloat(document.getElementById("areaTotal").value);
     const consumoArgamassa = parseFloat(document.getElementById("consumoArgamassa").value);
     const outroArgamassa = parseFloat(document.getElementById("argamassaOutro").value) || null;
-    const consumoRejunte = parseFloat(document.getElementById("consumoRejunte").value);
-    const outroRejunte = parseFloat(document.getElementById("rejunteOutro").value) || null;
-    const area = parseFloat(document.getElementById("areaTotal").value);
+    const valorPiso = area * valorMetro;
 
-    if (!areaComSobraGlobal || isNaN(valorMetro) || isNaN(consumoArgamassa) || isNaN(consumoRejunte)) {
+    if (!areaComSobraGlobal || isNaN(valorMetro) || isNaN(consumoArgamassa)) {
       document.getElementById("resultadoFinal").innerHTML = "Calcule primeiro o valor da cerâmica.";
       return;
     }
-
-    const valorPiso = area * valorMetro;
 
     // Argamassa
     const totalKgArgamassa = areaComSobraGlobal * consumoArgamassa;
@@ -177,13 +174,12 @@
         : 0);
     const valorArgamassa = sacos * precoArgamassa;
 
-    // Rejunte
-    const totalKgRejunte = areaComSobraGlobal * consumoRejunte;
-    const rejunteRadio = document.querySelector('input[name="rejunte"]:checked');
-    const pesoRejunte = rejunteRadio ? parseFloat(rejunteRadio.dataset.peso) : 1;
-    const precoRejunte = outroRejunte || (rejunteRadio ? parseFloat(rejunteRadio.value) : 0);
-    const embalagens = Math.ceil(totalKgRejunte / pesoRejunte);
-    const valorRejunte = embalagens * precoRejunte;
+    // Rejunte automático: 1kg por 5m²
+    const totalKgRejunte = areaComSobraGlobal / 5;
+    const sacos5kg = Math.floor(totalKgRejunte / 5);
+    const restanteKg = totalKgRejunte - sacos5kg * 5;
+    const sacos1kg = Math.ceil(restanteKg);
+    const valorRejunte = (sacos5kg * 59.9) + (sacos1kg * 14.9);
 
     const total = valorPiso + valorArgamassa + valorRejunte;
 
@@ -209,14 +205,17 @@
       - Valor: R$ ${valorArgamassa.toFixed(2)}<br><br>
 
       <strong>Rejunte:</strong><br>
-      - Consumo estimado: ${totalKgRejunte.toFixed(1)} kg<br>
-      - Embalagens de ${pesoRejunte}kg: ${embalagens}<br>
+      - Estimado: ${totalKgRejunte.toFixed(1)} kg<br>
+      - Sacos de 5kg: ${sacos5kg}<br>
+      - Sacos de 1kg: ${sacos1kg}<br>
       - Valor: R$ ${valorRejunte.toFixed(2)}<br><br>
 
       <strong>Total geral:</strong> R$ ${total.toFixed(2)}<br><br>
       <strong>Parcelamento:</strong><br>${parcelas}
     `;
   }
-</script>
+</script>  <footer style="margin-top: 40px; text-align: center; font-size: 14px; color: #666;">
+    Desenvolvido por <strong>Andreilson</strong> · Versão atualizada
+  </footer>
 </body>
 </html>
