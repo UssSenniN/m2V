@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Calculadora de Cerâmica</title>
-  <link rel="manifest" href="/m2V/manifest.json">
-  <meta name="theme-color" content="#0078D7">
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -39,23 +37,6 @@
       border-radius: 6px;
       font-size: 16px;
     }
-    .radio-group {
-      display: flex;
-      flex-wrap: wrap;
-      margin-top: 8px;
-      gap: 10px;
-    }
-    .radio-option {
-      display: flex;
-      align-items: center;
-      background: #eef2f9;
-      border-radius: 30px;
-      padding: 6px 12px;
-      cursor: pointer;
-    }
-    .radio-option input {
-      margin-right: 6px;
-    }
     button {
       width: 100%;
       margin-top: 20px;
@@ -74,6 +55,12 @@
       border-radius: 8px;
       font-size: 18px;
       line-height: 1.6;
+    }
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 14px;
+      color: #666;
     }
   </style>
 </head>
@@ -100,32 +87,12 @@
 
     <hr style="margin: 24px 0;">
 
-    <label>Consumo de argamassa (kg/m²):</label>
-    <input type="number" step="0.1" id="consumoArgamassa" value="5">
-
     <label>Preço por saco de argamassa (20kg):</label>
-    <div class="radio-group" id="argamassaGroup">
-      <label class="radio-option"><input type="radio" name="argamassa" value="14.90"> R$14,90</label>
-      <label class="radio-option"><input type="radio" name="argamassa" value="21.90"> R$21,90</label>
-      <label class="radio-option"><input type="radio" name="argamassa" value="49.90"> R$49,90</label>
-      <label class="radio-option"><input type="radio" name="argamassa" value="61.90"> R$61,90</label>
-    </div>
-    <input type="number" step="0.01" id="argamassaOutro" placeholder="Outro valor (R$)">
-
-    <label>Consumo de rejunte (kg/m²):</label>
-    <input type="number" step="0.1" id="consumoRejunte" value="0.5">
-
-    <label>Rejunte:</label>
-    <div class="radio-group" id="rejunteGroup">
-      <label class="radio-option"><input type="radio" name="rejunte" data-peso="1" value="14.90"> 1kg - R$14,90</label>
-      <label class="radio-option"><input type="radio" name="rejunte" data-peso="5" value="59.90"> 5kg - R$59,90</label>
-    </div>
-    <input type="number" step="0.01" id="rejunteOutro" placeholder="Outro valor (R$)">
+    <input type="number" step="0.01" id="argamassaOutro" placeholder="Ex: 32.00">
 
     <button onclick="calcularTotal()">Calcular Total com Argamassa e Rejunte</button>
 
-    <div class="resultado" id="resultadoFinal"></div>
-  </div><script>
+    <div class="resultado" id="resultadoFinal"></div><script>
   let areaComSobraGlobal = 0;
 
   function calcularCeramica() {
@@ -153,32 +120,32 @@
   }
 
   function calcularTotal() {
-    const valorMetro = parseFloat(document.getElementById("valorMetro").value);
     const area = parseFloat(document.getElementById("areaTotal").value);
-    const consumoArgamassa = parseFloat(document.getElementById("consumoArgamassa").value);
-    const outroArgamassa = parseFloat(document.getElementById("argamassaOutro").value) || null;
-    const valorPiso = area * valorMetro;
+    const valorMetro = parseFloat(document.getElementById("valorMetro").value);
+    const precoArgamassa = parseFloat(document.getElementById("argamassaOutro").value) || 0;
 
-    if (!areaComSobraGlobal || isNaN(valorMetro) || isNaN(consumoArgamassa)) {
-      document.getElementById("resultadoFinal").innerHTML = "Calcule primeiro o valor da cerâmica.";
+    if (!areaComSobraGlobal || isNaN(valorMetro) || isNaN(precoArgamassa)) {
+      document.getElementById("resultadoFinal").innerHTML = "Preencha os campos corretamente e calcule primeiro a cerâmica.";
       return;
     }
 
-    // Argamassa
-    const totalKgArgamassa = areaComSobraGlobal * consumoArgamassa;
-    const sacos = Math.ceil(totalKgArgamassa / 20);
-    let precoArgamassa =
-      outroArgamassa ||
-      (document.querySelector('input[name="argamassa"]:checked')?.value
-        ? parseFloat(document.querySelector('input[name="argamassa"]:checked').value)
-        : 0);
-    const valorArgamassa = sacos * precoArgamassa;
+    const valorPiso = area * valorMetro;
 
-    // Rejunte automático: 1kg por 5m²
+    // Argamassa
+    const consumoArgamassa = 5; // ocultado no layout, fixo internamente
+    const totalKgArgamassa = areaComSobraGlobal * consumoArgamassa;
+    const sacosArgamassa = Math.ceil(totalKgArgamassa / 20);
+    const valorArgamassa = sacosArgamassa * precoArgamassa;
+
+    // Rejunte - 1kg por 5m²
     const totalKgRejunte = areaComSobraGlobal / 5;
-    const sacos5kg = Math.floor(totalKgRejunte / 5);
-    const restanteKg = totalKgRejunte - sacos5kg * 5;
-    const sacos1kg = Math.ceil(restanteKg);
+    const arredondadoKg = totalKgRejunte % 1 >= 0.5
+      ? Math.ceil(totalKgRejunte)
+      : Math.floor(totalKgRejunte);
+    const sacos5kg = Math.floor(arredondadoKg / 5);
+    const restanteKg = arredondadoKg - sacos5kg * 5;
+    const sacos1kg = restanteKg;
+
     const valorRejunte = (sacos5kg * 59.9) + (sacos1kg * 14.9);
 
     const total = valorPiso + valorArgamassa + valorRejunte;
@@ -200,12 +167,12 @@
 
     document.getElementById("resultadoFinal").innerHTML = `
       <strong>Argamassa:</strong><br>
-      - Consumo estimado: ${totalKgArgamassa.toFixed(1)} kg<br>
-      - Sacos de 20kg: ${sacos}<br>
+      - Estimado: ${totalKgArgamassa.toFixed(1)} kg<br>
+      - Sacos de 20kg: ${sacosArgamassa}<br>
       - Valor: R$ ${valorArgamassa.toFixed(2)}<br><br>
 
       <strong>Rejunte:</strong><br>
-      - Estimado: ${totalKgRejunte.toFixed(1)} kg<br>
+      - Estimado: ${totalKgRejunte.toFixed(1)} kg → Arredondado: ${arredondadoKg} kg<br>
       - Sacos de 5kg: ${sacos5kg}<br>
       - Sacos de 1kg: ${sacos1kg}<br>
       - Valor: R$ ${valorRejunte.toFixed(2)}<br><br>
@@ -214,8 +181,10 @@
       <strong>Parcelamento:</strong><br>${parcelas}
     `;
   }
-</script>  <footer style="margin-top: 40px; text-align: center; font-size: 14px; color: #666;">
-    Desenvolvido por <strong>Andreilson</strong> · Versão atualizada
-  </footer>
+</script>
+
+<footer>
+  Desenvolvido por <strong>Andreilson</strong> · Versão 1.0
+</footer>
 </body>
 </html>
