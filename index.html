@@ -14,7 +14,7 @@
       padding: 12px;
     }
     .container {
-      max-width: 520px;
+      max-width: 540px;
       margin: auto;
       background: #fff;
       border-radius: 10px;
@@ -24,7 +24,6 @@
     h2 {
       text-align: center;
       color: #0078D7;
-      margin-bottom: 20px;
     }
     label {
       font-weight: bold;
@@ -40,17 +39,22 @@
       border-radius: 6px;
       font-size: 16px;
     }
-    .preco-opcoes button {
-      margin: 4px 6px 4px 0;
-      padding: 8px 12px;
-      background: #e0e0e0;
-      border: none;
-      border-radius: 4px;
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      gap: 10px;
+    }
+    .radio-option {
+      display: flex;
+      align-items: center;
+      background: #eef2f9;
+      border-radius: 30px;
+      padding: 6px 12px;
       cursor: pointer;
     }
-    .preco-opcoes button.selected {
-      background: #0078D7;
-      color: white;
+    .radio-option input {
+      margin-right: 6px;
     }
     button {
       width: 100%;
@@ -75,9 +79,7 @@
 </head>
 <body>
   <div class="container">
-    <h2>Calculadora de Cerâmica</h2>
-
-    <label>ID do Produto:</label>
+    <h2>Calculadora de Cerâmica</h2>    <label>ID do Produto:</label>
     <input type="text" id="idProduto" placeholder="Ex: CERAM-456XYZ">
 
     <label>Área total (m²):</label>
@@ -92,84 +94,129 @@
     <label>Margem de sobra (%):</label>
     <input type="number" id="margemSobra" value="10">
 
-    <label>Argamassa - consumo (kg/m²):</label>
+    <button onclick="calcularCeramica()">Calcular valor da cerâmica</button>
+
+    <div class="resultado" id="resultadoCeramica"></div>
+
+    <hr style="margin: 24px 0;">
+
+    <label>Consumo de argamassa (kg/m²):</label>
     <input type="number" step="0.1" id="consumoArgamassa" value="5">
 
-    <label>Argamassa - preço por saco:</label>
-    <div class="preco-opcoes" id="argamassa-precos">
-      <button onclick="selecionarPreco(this, 'argamassa')">14.90</button>
-      <button onclick="selecionarPreco(this, 'argamassa')">21.90</button>
-      <button onclick="selecionarPreco(this, 'argamassa')">49.90</button>
-      <button onclick="selecionarPreco(this, 'argamassa')">61.90</button>
+    <label>Preço por saco de argamassa (20kg):</label>
+    <div class="radio-group" id="argamassaGroup">
+      <label class="radio-option"><input type="radio" name="argamassa" value="14.90"> R$14,90</label>
+      <label class="radio-option"><input type="radio" name="argamassa" value="21.90"> R$21,90</label>
+      <label class="radio-option"><input type="radio" name="argamassa" value="49.90"> R$49,90</label>
+      <label class="radio-option"><input type="radio" name="argamassa" value="61.90"> R$61,90</label>
     </div>
     <input type="number" step="0.01" id="argamassaOutro" placeholder="Outro valor (R$)">
 
-    <label>Rejunte - consumo (kg/m²):</label>
+    <label>Consumo de rejunte (kg/m²):</label>
     <input type="number" step="0.1" id="consumoRejunte" value="0.5">
 
-    <label>Rejunte - tipo:</label>
-    <div class="preco-opcoes" id="rejunte-tipos">
-      <button onclick="selecionarPeso(this)">1kg (R$14.90)</button>
-      <button onclick="selecionarPeso(this)">5kg (R$59.90)</button>
+    <label>Rejunte:</label>
+    <div class="radio-group" id="rejunteGroup">
+      <label class="radio-option"><input type="radio" name="rejunte" data-peso="1" value="14.90"> 1kg - R$14,90</label>
+      <label class="radio-option"><input type="radio" name="rejunte" data-peso="5" value="59.90"> 5kg - R$59,90</label>
     </div>
     <input type="number" step="0.01" id="rejunteOutro" placeholder="Outro valor (R$)">
 
-    <button onclick="calcular()">Calcular</button>
+    <button onclick="calcularTotal()">Calcular Total com Argamassa e Rejunte</button>
 
-    <div class="resultado" id="resultado"></div>
-  </div>
+    <div class="resultado" id="resultadoFinal"></div>
+  </div><script>
+  let areaComSobraGlobal = 0;
 
-  <script>
-    let valorArgamassaSelecionado = null;
-    let valorRejunteSelecionado = null;
-    let pesoRejunteSelecionado = 1;
+  function calcularCeramica() {
+    const area = parseFloat(document.getElementById("areaTotal").value);
+    const areaCaixa = parseFloat(document.getElementById("areaCaixa").value);
+    const valorMetro = parseFloat(document.getElementById("valorMetro").value);
+    const sobra = parseFloat(document.getElementById("margemSobra").value) / 100;
 
-    function selecionarPreco(btn, tipo) {
-      const grupo = tipo === 'argamassa' ? 'argamassa-precos' : '';
-      document.querySelectorAll(`#${grupo} button`).forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-      const valor = parseFloat(btn.innerText.replace(",", "."));
-      if (tipo === 'argamassa') valorArgamassaSelecionado = valor;
+    if (isNaN(area) || isNaN(areaCaixa) || isNaN(valorMetro)) {
+      document.getElementById("resultadoCeramica").innerHTML = "Preencha os campos obrigatórios.";
+      return;
     }
 
-    function selecionarPeso(btn) {
-      document.querySelectorAll(`#rejunte-tipos button`).forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-      if (btn.innerText.includes("1kg")) {
-        valorRejunteSelecionado = 14.90;
-        pesoRejunteSelecionado = 1;
-      } else {
-        valorRejunteSelecionado = 59.90;
-        pesoRejunteSelecionado = 5;
+    const areaComSobra = area * (1 + sobra);
+    const caixas = Math.ceil(areaComSobra / areaCaixa);
+    const valorPiso = area * valorMetro;
+
+    areaComSobraGlobal = areaComSobra;
+
+    document.getElementById("resultadoCeramica").innerHTML = `
+      <strong>Área com sobra:</strong> ${areaComSobra.toFixed(2)} m²<br>
+      <strong>Caixas necessárias:</strong> ${caixas}<br>
+      <strong>Valor da cerâmica:</strong> R$ ${valorPiso.toFixed(2)}
+    `;
+  }
+
+  function calcularTotal() {
+    const valorMetro = parseFloat(document.getElementById("valorMetro").value);
+    const consumoArgamassa = parseFloat(document.getElementById("consumoArgamassa").value);
+    const outroArgamassa = parseFloat(document.getElementById("argamassaOutro").value) || null;
+    const consumoRejunte = parseFloat(document.getElementById("consumoRejunte").value);
+    const outroRejunte = parseFloat(document.getElementById("rejunteOutro").value) || null;
+    const area = parseFloat(document.getElementById("areaTotal").value);
+
+    if (!areaComSobraGlobal || isNaN(valorMetro) || isNaN(consumoArgamassa) || isNaN(consumoRejunte)) {
+      document.getElementById("resultadoFinal").innerHTML = "Calcule primeiro o valor da cerâmica.";
+      return;
+    }
+
+    const valorPiso = area * valorMetro;
+
+    // Argamassa
+    const totalKgArgamassa = areaComSobraGlobal * consumoArgamassa;
+    const sacos = Math.ceil(totalKgArgamassa / 20);
+    let precoArgamassa =
+      outroArgamassa ||
+      (document.querySelector('input[name="argamassa"]:checked')?.value
+        ? parseFloat(document.querySelector('input[name="argamassa"]:checked').value)
+        : 0);
+    const valorArgamassa = sacos * precoArgamassa;
+
+    // Rejunte
+    const totalKgRejunte = areaComSobraGlobal * consumoRejunte;
+    const rejunteRadio = document.querySelector('input[name="rejunte"]:checked');
+    const pesoRejunte = rejunteRadio ? parseFloat(rejunteRadio.dataset.peso) : 1;
+    const precoRejunte = outroRejunte || (rejunteRadio ? parseFloat(rejunteRadio.value) : 0);
+    const embalagens = Math.ceil(totalKgRejunte / pesoRejunte);
+    const valorRejunte = embalagens * precoRejunte;
+
+    const total = valorPiso + valorArgamassa + valorRejunte;
+
+    let parcelas = "";
+    if (total >= 400) {
+      for (let i = 1; i <= 10; i++) {
+        let vp = (total / i).toFixed(2);
+        parcelas += `${i}x de R$ ${vp}<br>`;
+      }
+    } else {
+      const minParcela = 40;
+      const nParcelas = Math.floor(total / minParcela) || 1;
+      for (let i = 1; i <= nParcelas; i++) {
+        let vp = (total / i).toFixed(2);
+        parcelas += `${i}x de R$ ${vp}<br>`;
       }
     }
 
-    function calcular() {
-      const idProduto = document.getElementById("idProduto").value;
-      const area = parseFloat(document.getElementById("areaTotal").value);
-      const areaCaixa = parseFloat(document.getElementById("areaCaixa").value);
-      const valorMetro = parseFloat(document.getElementById("valorMetro").value);
-      const sobra = parseFloat(document.getElementById("margemSobra").value) / 100;
+    document.getElementById("resultadoFinal").innerHTML = `
+      <strong>Argamassa:</strong><br>
+      - Consumo estimado: ${totalKgArgamassa.toFixed(1)} kg<br>
+      - Sacos de 20kg: ${sacos}<br>
+      - Valor: R$ ${valorArgamassa.toFixed(2)}<br><br>
 
-      const consumoArgamassa = parseFloat(document.getElementById("consumoArgamassa").value);
-      const outroArgamassa = parseFloat(document.getElementById("argamassaOutro").value) || null;
+      <strong>Rejunte:</strong><br>
+      - Consumo estimado: ${totalKgRejunte.toFixed(1)} kg<br>
+      - Embalagens de ${pesoRejunte}kg: ${embalagens}<br>
+      - Valor: R$ ${valorRejunte.toFixed(2)}<br><br>
 
-      const consumoRejunte = parseFloat(document.getElementById("consumoRejunte").value);
-      const outroRejunte = parseFloat(document.getElementById("rejunteOutro").value) || null;
-
-      if (isNaN(area) || isNaN(areaCaixa) || isNaN(valorMetro)) {
-        document.getElementById("resultado").innerHTML = "Preencha todos os campos obrigatórios.";
-        return;
-      }
-
-      const areaComSobra = area * (1 + sobra);
-      const caixas = Math.ceil(areaComSobra / areaCaixa);
-      const valorPiso = area * valorMetro;
-
-      const totalArgamassaKg = areaComSobra * consumoArgamassa;
-      const sacosArgamassa = Math.ceil(totalArgamassaKg / 20);
-      const precoArgamassa = outroArgamassa || valorArgamassaSelecionado || 0;
-      const valorArgamassa = sacosArgamassa * precoArgamassa;
-
-      const totalRejunteKg = areaComSobra * consumoRejunte;
-      const embalagensRejunte = Math.ceil(totalRejunteKg / pesoRejunteSelecionado
+      <strong>Total geral:</strong> R$ ${total.toFixed(2)}<br><br>
+      <strong>Parcelamento:</strong><br>${parcelas}
+    `;
+  }
+</script>
+</body>
+</html>
