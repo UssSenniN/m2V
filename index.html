@@ -1,123 +1,75 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0078D7">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora de Cerâmica</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f2f3f7;
-      padding: 20px;
-      margin: 0;
-      color: #333;
-    }
-
-    .container {
-      max-width: 480px;
-      margin: auto;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      padding: 20px;
-    }
-
-    h2 {
-      text-align: center;
-      color: #0078D7;
-      margin-bottom: 20px;
-    }
-
-    label {
-      font-weight: 600;
-      margin-top: 12px;
-      display: block;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      margin-top: 6px;
-      margin-bottom: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      background-color: #0078D7;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #005fa3;
-    }
-
-    .resultado {
-      background: #e8f0fe;
-      padding: 15px;
-      border-radius: 6px;
-      margin-top: 20px;
-    }
-  </style>
-</head><!DOCTYPE html>
-<html lang="pt-BR">
-<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Calculadora de Cerâmica</title>
+  <link rel="manifest" href="/m2V/manifest.json">
+  <meta name="theme-color" content="#0078D7">
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f2f5;
       margin: 0;
-      background: #f0f2f5;
-      padding: 20px;
-      color: #333;
+      padding: 0 12px;
     }
 
     .container {
-      max-width: 480px;
+      max-width: 500px;
       margin: auto;
       background: #fff;
       border-radius: 10px;
-      padding: 24px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 20px;
     }
 
     h2 {
       text-align: center;
       color: #0078D7;
-      margin-bottom: 20px;
     }
 
+    nav {
+      display: flex;
+      margin-bottom: 16px;
+    }
+
+    nav button {
+      flex: 1;
+      padding: 12px;
+      font-weight: bold;
+      border: none;
+      border-bottom: 3px solid transparent;
+      background: #f0f2f5;
+      cursor: pointer;
+    }
+
+    nav button.active {
+      border-bottom: 3px solid #0078D7;
+      background: #fff;
+    }
+
+    .aba { display: none; }
+    .aba.active { display: block; }
+
     label {
-      font-weight: 600;
-      margin-top: 14px;
       display: block;
+      margin-top: 14px;
+      font-weight: 600;
     }
 
     input {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       margin-top: 6px;
-      margin-bottom: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 16px;
     }
 
-    button {
+    button.calcular {
       width: 100%;
       padding: 14px;
-      margin-top: 12px;
+      margin-top: 18px;
       background-color: #0078D7;
       color: white;
       border: none;
@@ -126,77 +78,133 @@
       cursor: pointer;
     }
 
-    button:hover {
+    button.calcular:hover {
       background-color: #005fa3;
     }
 
     .resultado {
-      margin-top: 20px;
-      background: #e8f0fe;
-      padding: 16px;
-      border-radius: 6px;
-    }
-
-    @media print {
-      button, input, label {
-        display: none;
-      }
-      .container {
-        box-shadow: none;
-        margin: 0;
-        border: none;
-      }
-      body {
-        padding: 0;
-        background: white;
-      }
+      margin-top: 24px;
+      background: #eef3fb;
+      padding: 18px;
+      border-radius: 8px;
+      font-size: 18px;
+      line-height: 1.6;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Calculadora de Cerâmica</h2>
+    <nav>
+      <button onclick="ativarAba('ceramica')" class="active">Cerâmica</button>
+      <button onclick="ativarAba('argamassa')">Argamassa</button>
+      <button onclick="ativarAba('rejunte')">Rejunte</button>
+    </nav>
 
-    <label>Área total (m²):</label>
-    <input type="number" id="areaTotal" placeholder="Ex: 100">
+    <div id="ceramica" class="aba active">
+      <label>Codinome / Projeto:</label>
+      <input type="text" id="codinome">
 
-    <label>Área coberta por caixa (m²):</label>
-    <input type="number" id="areaCaixa" step="0.01" placeholder="Ex: 2.3">
+      <label>ID do Produto:</label>
+      <input type="text" id="idProduto">
 
-    <label>Valor do m² (R$):</label>
-    <input type="number" id="valorMetro" step="0.01" placeholder="Ex: 25.90">
+      <label>Área total (m²):</label>
+      <input type="number" id="areaTotal">
 
-    <label>Margem de sobra (%):</label>
-    <input type="number" id="margemSobra" step="1" placeholder="Ex: 10">
+      <label>Área por caixa (m²):</label>
+      <input type="number" step="0.01" id="areaCaixa">
 
-    <button onclick="calcular()">Calcular</button>
-    <button onclick="window.print()">Salvar ou Imprimir PDF</button>
+      <label>Valor do m² (R$):</label>
+      <input type="number" step="0.01" id="valorMetro">
+
+      <label>Margem de sobra (%):</label>
+      <input type="number" id="margemSobra" value="10">
+    </div>
+
+    <div id="argamassa" class="aba">
+      <label>Consumo de argamassa (kg/m²):</label>
+      <input type="number" step="0.1" id="consumoArgamassa" value="5">
+
+      <label>Peso por saco (kg):</label>
+      <input type="number" id="pesoSaco" value="20">
+
+      <label>Preço por saco (R$):</label>
+      <input type="number" step="0.01" id="precoSaco" value="32">
+    </div>
+
+    <div id="rejunte" class="aba">
+      <label>Consumo de rejunte (kg/m²):</label>
+      <input type="number" step="0.1" id="consumoRejunte" value="0.5">
+
+      <label>Peso por embalagem (kg):</label>
+      <input type="number" id="pesoRejunte" value="1">
+
+      <label>Preço por embalagem (R$):</label>
+      <input type="number" step="0.01" id="precoRejunte" value="9">
+    </div>
+
+    <button class="calcular" onclick="calcularTudo()">Calcular tudo</button>
 
     <div class="resultado" id="resultado"></div>
   </div>
 
   <script>
-    function calcular() {
-      const areaTotal = parseFloat(document.getElementById("areaTotal").value);
+    function ativarAba(id) {
+      document.querySelectorAll("nav button").forEach(btn => btn.classList.remove("active"));
+      document.querySelectorAll(".aba").forEach(div => div.classList.remove("active"));
+      document.querySelector(`nav button[onclick="ativarAba('${id}')"]`).classList.add("active");
+      document.getElementById(id).classList.add("active");
+    }
+
+    function calcularTudo() {
+      const codinome = document.getElementById("codinome").value;
+      const idProduto = document.getElementById("idProduto").value;
+      const area = parseFloat(document.getElementById("areaTotal").value);
       const areaCaixa = parseFloat(document.getElementById("areaCaixa").value);
       const valorMetro = parseFloat(document.getElementById("valorMetro").value);
-      const margemSobra = parseFloat(document.getElementById("margemSobra").value) / 100;
+      const sobra = parseFloat(document.getElementById("margemSobra").value) / 100;
 
-      if (isNaN(areaTotal) || isNaN(areaCaixa) || isNaN(valorMetro) || isNaN(margemSobra)) {
-        document.getElementById("resultado").innerHTML = `<p>Preencha todos os campos corretamente.</p>`;
+      const consumoArgamassa = parseFloat(document.getElementById("consumoArgamassa").value);
+      const pesoSaco = parseFloat(document.getElementById("pesoSaco").value);
+      const precoSaco = parseFloat(document.getElementById("precoSaco").value);
+
+      const consumoRejunte = parseFloat(document.getElementById("consumoRejunte").value);
+      const pesoRejunte = parseFloat(document.getElementById("pesoRejunte").value);
+      const precoRejunte = parseFloat(document.getElementById("precoRejunte").value);
+
+      if (isNaN(area) || isNaN(areaCaixa) || isNaN(valorMetro)) {
+        document.getElementById("resultado").innerHTML = "<p>Preencha os campos principais na aba Cerâmica.</p>";
         return;
       }
 
-      const areaComSobra = areaTotal * (1 + margemSobra);
+      const areaComSobra = area * (1 + sobra);
       const caixas = Math.ceil(areaComSobra / areaCaixa);
-      const total = areaTotal * valorMetro;
+      const valorCeramica = area * valorMetro;
+
+      const totalArgamassaKg = areaComSobra * consumoArgamassa;
+      const sacosArgamassa = Math.ceil(totalArgamassaKg / pesoSaco);
+      const valorArgamassa = sacosArgamassa * precoSaco;
+
+      const totalRejunteKg = areaComSobra * consumoRejunte;
+      const embalagensRejunte = Math.ceil(totalRejunteKg / pesoRejunte);
+      const valorRejunte = embalagensRejunte * precoRejunte;
+
+      const valorTotal = valorCeramica + valorArgamassa + valorRejunte;
+
+      let parcelas = "";
+      for (let i = 1; i <= 10; i++) {
+        const valorParcela = (valorTotal / i).toFixed(2);
+        parcelas += `<br>• ${i}x de R$ ${valorParcela} sem juros`;
+      }
 
       document.getElementById("resultado").innerHTML = `
-        <p><strong>Área com sobra:</strong> ${areaComSobra.toFixed(2)} m²</p>
-        <p><strong>Caixas necessárias:</strong> ${caixas}</p>
-        <p><strong>Valor total estimado (sem sobra):</strong> R$ ${total.toFixed(2)}</p>
-      `;
-    }
-  </script>
-</body>
-</html>
+        <strong>ID do Projeto:</strong> ${codinome || "N/D"}<br>
+        <strong>ID do Produto:</strong> ${idProduto || "N/D"}<br><br>
+
+        <strong>Área com sobra:</strong> ${areaComSobra.toFixed(2)} m²<br>
+        <strong>Caixas de cerâmica:</strong> ${caixas}<br>
+        <strong>Argamassa:</strong> ${sacosArgamassa} saco(s)<br>
+        <strong>Rejunte:</strong> ${embalagensRejunte} embalagem(ns)<br><br>
+
+        <strong>Total cerâmica:</strong> R$ ${valorCeramica.toFixed(2)}<br>
+        <strong>Total argamassa:</strong> R$ ${valorArgamassa.toFixed(2)}<br
