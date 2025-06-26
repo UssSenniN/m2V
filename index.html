@@ -136,11 +136,11 @@
 
     const valorPiso = areaAdquiridaGlobal * valorMetro;
 
-    // Novo cálculo de argamassa: divide por 3 e arredonda pra cima
+    // ✔️ Argamassa: divide a área adquirida por 3 e arredonda pra cima
     const sacosArgamassa = Math.ceil(areaAdquiridaGlobal / 3);
     const valorArgamassa = sacosArgamassa * precoArgamassa;
 
-    // Rejunte (mantido como antes)
+    // Rejunte
     const totalKgRejunte = areaAdquiridaGlobal / 5;
     const arredondadoKg = totalKgRejunte % 1 >= 0.5
       ? Math.ceil(totalKgRejunte)
@@ -169,8 +169,8 @@
 
     document.getElementById("resultadoFinal").innerHTML = `
       <strong>Argamassa:</strong><br>
-      - Estimado: ${areaAdquiridaGlobal.toFixed(2)} m² / 3 = ${Math.ceil(areaAdquiridaGlobal / 3)} sacos<br>
-      - Sacos de 20kg: ${sacosArgamassa}<br>
+      - Área base: ${areaAdquiridaGlobal.toFixed(2)} m²<br>
+      - Cálculo: ${areaAdquiridaGlobal.toFixed(2)} ÷ 3 = ${Math.ceil(areaAdquiridaGlobal / 3)} sacos<br>
       - Valor: R$ ${valorArgamassa.toFixed(2)}<br><br>
 
       <strong>Rejunte:</strong><br>
@@ -183,8 +183,7 @@
       <strong>Parcelamento:</strong><br>${parcelas}
     `;
   }
-</script> 
-    <footer>
+</script>  <footer>
     Desenvolvido por <strong>Andreilson</strong> · Versão 1.1
   </footer>
 </body>
