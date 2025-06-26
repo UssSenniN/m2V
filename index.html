@@ -96,6 +96,7 @@
 
     <div class="resultado" id="resultadoFinal"></div><script>
   let areaComSobraGlobal = 0;
+  let areaAdquiridaGlobal = 0;
 
   function calcularCeramica() {
     const area = parseFloat(document.getElementById("areaTotal").value);
@@ -110,37 +111,39 @@
 
     const areaComSobra = area * (1 + sobra);
     const caixas = Math.ceil(areaComSobra / areaCaixa);
-    const valorPiso = area * valorMetro;
+    const areaRealAdquirida = caixas * areaCaixa;
+    const valorPiso = areaRealAdquirida * valorMetro;
 
     areaComSobraGlobal = areaComSobra;
+    areaAdquiridaGlobal = areaRealAdquirida;
 
     document.getElementById("resultadoCeramica").innerHTML = `
       <strong>Área com sobra:</strong> ${areaComSobra.toFixed(2)} m²<br>
       <strong>Caixas necessárias:</strong> ${caixas}<br>
+      <strong>Área real adquirida:</strong> ${areaRealAdquirida.toFixed(2)} m²<br>
       <strong>Valor da cerâmica:</strong> R$ ${valorPiso.toFixed(2)}
     `;
   }
 
   function calcularTotal() {
-    const area = parseFloat(document.getElementById("areaTotal").value);
     const valorMetro = parseFloat(document.getElementById("valorMetro").value);
     const precoArgamassa = parseFloat(document.getElementById("argamassaOutro").value) || 0;
 
-    if (!areaComSobraGlobal || isNaN(valorMetro) || isNaN(precoArgamassa)) {
+    if (!areaAdquiridaGlobal || isNaN(valorMetro) || isNaN(precoArgamassa)) {
       document.getElementById("resultadoFinal").innerHTML = "Preencha os campos corretamente e calcule primeiro a cerâmica.";
       return;
     }
 
-    const valorPiso = area * valorMetro;
+    const valorPiso = areaAdquiridaGlobal * valorMetro;
 
     // Argamassa
     const consumoArgamassa = 5;
-    const totalKgArgamassa = areaComSobraGlobal * consumoArgamassa;
+    const totalKgArgamassa = areaAdquiridaGlobal * consumoArgamassa;
     const sacosArgamassa = Math.ceil(totalKgArgamassa / 20);
-    const valorArgamassa = (sacosArgamassa * precoArgamassa) / 3; // ✔️ Dividido por 3 aqui
+    const valorArgamassa = (sacosArgamassa * precoArgamassa) / 3;
 
     // Rejunte
-    const totalKgRejunte = areaComSobraGlobal / 5;
+    const totalKgRejunte = areaAdquiridaGlobal / 5;
     const arredondadoKg = totalKgRejunte % 1 >= 0.5
       ? Math.ceil(totalKgRejunte)
       : Math.floor(totalKgRejunte);
