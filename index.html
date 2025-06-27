@@ -56,15 +56,6 @@
       font-size: 18px;
       line-height: 1.6;
     }
-    .orcamentos-container {
-      display: none;
-      max-width: 540px;
-      margin: auto;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      padding: 20px;
-    }
     footer {
       margin-top: 40px;
       text-align: center;
@@ -104,19 +95,9 @@
     <button onclick="calcularTotal()">Calcular Total com Argamassa e Rejunte</button>
 
     <div class="resultado" id="resultadoFinal"></div>
-
-    <button onclick="salvarOrcamento()">Salvar Orçamento</button>
-    <button onclick="mostrarOrcamentos()">Ver Orçamentos</button>
-  </div>
-
-  <div class="orcamentos-container" id="orcamentosContainer">
-    <h2>Orçamentos Salvos</h2>
-    <div id="listaOrcamentos"></div>
-    <button onclick="fecharOrcamentos()">Fechar</button>
   </div>
 
   <script>
-    let orcamentos = [];
     let areaAdquiridaGlobal = 0;
 
     function calcularCeramica() {
@@ -159,47 +140,46 @@
       const valorPiso = areaAdquiridaGlobal * valorMetro;
       const sacosArgamassa = Math.ceil(areaAdquiridaGlobal / 3);
       const valorArgamassa = sacosArgamassa * precoArgamassa;
-      const total = valorPiso + valorArgamassa;
+
+      const totalKgRejunte = areaAdquiridaGlobal / 5;
+      const sacosRejunte = Math.ceil(totalKgRejunte);
+      const valorRejunte = (sacosRejunte * 14.9);
+
+      const total = valorPiso + valorArgamassa + valorRejunte;
+
+      let parcelas = "";
+      if (total >= 400) {
+        for (let i = 1; i <= 10; i++) {
+          let vp = (total / i).toFixed(2);
+          parcelas += `${i}x de R$ ${vp}<br>`;
+        }
+      } else {
+        const minParcela = 40;
+        const nParcelas = Math.floor(total / minParcela) || 1;
+        for (let i = 1; i <= nParcelas; i++) {
+          let vp = (total / i).toFixed(2);
+          parcelas += `${i}x de R$ ${vp}<br>`;
+        }
+      }
 
       document.getElementById("resultadoFinal").innerHTML = `
-        <strong>Argamassa:</strong> ${sacosArgamassa} sacos - R$ ${valorArgamassa.toFixed(2)}<br>
-        <strong>Total geral:</strong> R$ ${total.toFixed(2)}
+        <strong>Argamassa:</strong><br>
+        - Quantidade: ${sacosArgamassa} sacos<br>
+        - Valor: R$ ${valorArgamassa.toFixed(2)}<br><br>
+
+        <strong>Rejunte:</strong><br>
+        - Quantidade: ${sacosRejunte} sacos<br>
+        - Valor: R$ ${valorRejunte.toFixed(2)}<br><br>
+
+        <strong>Total geral:</strong> R$ ${total.toFixed(2)}<br><br>
+
+        <strong>Parcelamento:</strong><br>${parcelas}
       `;
-    }
-
-    function salvarOrcamento() {
-      let resultado = document.getElementById("resultadoFinal").innerHTML;
-      if (resultado) {
-        orcamentos.push(resultado);
-        alert("Orçamento salvo com sucesso!");
-      }
-    }
-
-    function mostrarOrcamentos() {
-      const container = document.getElementById("orcamentosContainer");
-      const lista = document.getElementById("listaOrcamentos");
-      lista.innerHTML = orcamentos.map((orc, index) => `
-        <div>
-          ${orc}
-          <button onclick="excluirOrcamento(${index})">Excluir</button>
-        </div>
-        <hr>
-      `).join('');
-      container.style.display = "block";
-    }
-
-    function excluirOrcamento(index) {
-      orcamentos.splice(index, 1);
-      mostrarOrcamentos();
-    }
-
-    function fecharOrcamentos() {
-      document.getElementById("orcamentosContainer").style.display = "none";
     }
   </script>
 
   <footer>
-    Todos os direitos reservados a <strong>Under.io</strong> · Versão 1.3
+    Todos os direitos reservados a <strong>Under.io</strong> · Versão 1.4
   </footer>
 </body>
 </html>
