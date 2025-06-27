@@ -116,7 +116,7 @@
   </div>
 
   <script>
-    let orcamentos = [];
+    let orcamentos = JSON.parse(localStorage.getItem("orcamentos")) || [];
     let areaAdquiridaGlobal = 0;
 
     function calcularCeramica() {
@@ -167,32 +167,42 @@
 
       const total = valorPiso + valorArgamassa + valorRejunte;
 
-      let parcelas = "";
-      if (total >= 400) {
-        for (let i = 1; i <= 10; i++) {
-          let vp = (total / i).toFixed(2);
-          parcelas += `${i}x de R$ ${vp}<br>`;
-        }
-      } else {
-        const minParcela = 40;
-        const nParcelas = Math.floor(total / minParcela) || 1;
-        for (let i = 1; i <= nParcelas; i++) {
-          let vp = (total / i).toFixed(2);
-          parcelas += `${i}x de R$ ${vp}<br>`;
-        }
-      }
-
       document.getElementById("resultadoFinal").innerHTML = `
         <strong>Argamassa:</strong> ${sacosArgamassa} sacos - R$ ${valorArgamassa.toFixed(2)}<br>
         <strong>Rejunte:</strong> ${sacos5kg} sacos de 5kg + ${sacos1kg} sacos de 1kg - R$ ${valorRejunte.toFixed(2)}<br>
-        <strong>Total geral:</strong> R$ ${total.toFixed(2)}<br><br>
-        <strong>Parcelamento:</strong><br>${parcelas}
+        <strong>Total geral:</strong> R$ ${total.toFixed(2)}
       `;
+
+      orcamentos.push(document.getElementById("resultadoFinal").innerHTML);
+      localStorage.setItem("orcamentos", JSON.stringify(orcamentos));
+    }
+
+    function mostrarOrcamentos() {
+      const container = document.getElementById("orcamentosContainer");
+      const lista = document.getElementById("listaOrcamentos");
+      lista.innerHTML = orcamentos.map((orc, index) => `
+        <div>
+          ${orc}
+          <button onclick="excluirOrcamento(${index})">Excluir</button>
+        </div>
+        <hr>
+      `).join('');
+      container.style.display = "block";
+    }
+
+    function excluirOrcamento(index) {
+      orcamentos.splice(index, 1);
+      localStorage.setItem("orcamentos", JSON.stringify(orcamentos));
+      mostrarOrcamentos();
+    }
+
+    function fecharOrcamentos() {
+      document.getElementById("orcamentosContainer").style.display = "none";
     }
   </script>
 
   <footer>
-    Todos os direitos reservados a <strong>Under.io</strong> · Versão 1.6
+    Todos os direitos reservados a <strong>And.io</strong> · Versão 1.7
   </footer>
 </body>
 </html>
