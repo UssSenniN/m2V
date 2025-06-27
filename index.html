@@ -19,14 +19,6 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
       padding: 20px;
     }
-    #titulo {
-      color: red;
-      font-size: 36px;
-      font-weight: bold;
-      text-transform: uppercase;
-      text-align: center;
-      font-family: 'Arial', sans-serif;
-    }
     h2 {
       text-align: center;
       color: #0078D7;
@@ -64,6 +56,15 @@
       font-size: 18px;
       line-height: 1.6;
     }
+    .orcamentos-container {
+      display: none;
+      max-width: 540px;
+      margin: auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      padding: 20px;
+    }
     footer {
       margin-top: 40px;
       text-align: center;
@@ -74,7 +75,6 @@
 </head>
 <body>
   <div class="container">
-    <h1 id="titulo">VENEZA</h1>
     <h2>Calculadora de Cerâmica</h2>
 
     <label>ID do Produto:</label>
@@ -106,13 +106,18 @@
     <div class="resultado" id="resultadoFinal"></div>
 
     <button onclick="salvarOrcamento()">Salvar Orçamento</button>
-    <button onclick="excluirOrcamento()">Excluir Orçamento</button>
-    <button onclick="enviarOrcamento()">Enviar Orçamento</button>
+    <button onclick="mostrarOrcamentos()">Ver Orçamentos</button>
+  </div>
+
+  <div class="orcamentos-container" id="orcamentosContainer">
+    <h2>Orçamentos Salvos</h2>
+    <div id="listaOrcamentos"></div>
+    <button onclick="fecharOrcamentos()">Fechar</button>
   </div>
 
   <script>
     let orcamentos = [];
-    let areaAdquiridaGlobal = 0; // Variável global corrigida
+    let areaAdquiridaGlobal = 0;
 
     function calcularCeramica() {
       const idProduto = document.getElementById("idProduto").value;
@@ -131,7 +136,7 @@
       const areaRealAdquirida = caixas * areaCaixa;
       const valorPiso = areaRealAdquirida * valorMetro;
 
-      areaAdquiridaGlobal = areaRealAdquirida; // Armazena corretamente
+      areaAdquiridaGlobal = areaRealAdquirida;
 
       document.getElementById("resultadoCeramica").innerHTML = `
         <strong>ID do Produto:</strong> ${idProduto}<br>
@@ -157,37 +162,44 @@
       const total = valorPiso + valorArgamassa;
 
       document.getElementById("resultadoFinal").innerHTML = `
+        <strong>Argamassa:</strong> ${sacosArgamassa} sacos - R$ ${valorArgamassa.toFixed(2)}<br>
         <strong>Total geral:</strong> R$ ${total.toFixed(2)}
       `;
     }
 
     function salvarOrcamento() {
-      let resultado = calcularCeramica();
+      let resultado = document.getElementById("resultadoFinal").innerHTML;
       if (resultado) {
         orcamentos.push(resultado);
         alert("Orçamento salvo com sucesso!");
       }
     }
 
-    function excluirOrcamento() {
-      const idProduto = document.getElementById("idProduto").value;
-      orcamentos = orcamentos.filter(orcamento => orcamento.id !== idProduto);
-      alert("Orçamento excluído!");
+    function mostrarOrcamentos() {
+      const container = document.getElementById("orcamentosContainer");
+      const lista = document.getElementById("listaOrcamentos");
+      lista.innerHTML = orcamentos.map((orc, index) => `
+        <div>
+          ${orc}
+          <button onclick="excluirOrcamento(${index})">Excluir</button>
+        </div>
+        <hr>
+      `).join('');
+      container.style.display = "block";
     }
 
-    function enviarOrcamento() {
-      const idProduto = document.getElementById("idProduto").value;
-      let orcamento = orcamentos.find(orc => orc.id === idProduto);
-      if (orcamento) {
-        alert(`Orçamento ID ${idProduto} enviado com sucesso!`);
-      } else {
-        alert("Orçamento não encontrado.");
-      }
+    function excluirOrcamento(index) {
+      orcamentos.splice(index, 1);
+      mostrarOrcamentos();
+    }
+
+    function fecharOrcamentos() {
+      document.getElementById("orcamentosContainer").style.display = "none";
     }
   </script>
 
   <footer>
-    Todos os direitos reservados a <strong>Under.io</strong> · Versão 1.2.1
+    Todos os direitos reservados a <strong>Under.io</strong> · Versão 1.3
   </footer>
 </body>
 </html>
