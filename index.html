@@ -112,6 +112,7 @@
 
   <script>
     let orcamentos = [];
+    let areaAdquiridaGlobal = 0; // Variável global corrigida
 
     function calcularCeramica() {
       const idProduto = document.getElementById("idProduto").value;
@@ -130,6 +131,8 @@
       const areaRealAdquirida = caixas * areaCaixa;
       const valorPiso = areaRealAdquirida * valorMetro;
 
+      areaAdquiridaGlobal = areaRealAdquirida; // Armazena corretamente
+
       document.getElementById("resultadoCeramica").innerHTML = `
         <strong>ID do Produto:</strong> ${idProduto}<br>
         <strong>Área com sobra:</strong> ${areaComSobra.toFixed(2)} m²<br>
@@ -137,8 +140,25 @@
         <strong>Área real adquirida:</strong> ${areaRealAdquirida.toFixed(2)} m²<br>
         <strong>Valor da cerâmica:</strong> R$ ${valorPiso.toFixed(2)}
       `;
+    }
 
-      return { id: idProduto, area: areaComSobra.toFixed(2), custo: valorPiso.toFixed(2) };
+    function calcularTotal() {
+      const precoArgamassa = parseFloat(document.getElementById("argamassaOutro").value) || 0;
+      const valorMetro = parseFloat(document.getElementById("valorMetro").value);
+
+      if (!areaAdquiridaGlobal || isNaN(valorMetro) || isNaN(precoArgamassa)) {
+        document.getElementById("resultadoFinal").innerHTML = "Preencha os campos corretamente e calcule primeiro a cerâmica.";
+        return;
+      }
+
+      const valorPiso = areaAdquiridaGlobal * valorMetro;
+      const sacosArgamassa = Math.ceil(areaAdquiridaGlobal / 3);
+      const valorArgamassa = sacosArgamassa * precoArgamassa;
+      const total = valorPiso + valorArgamassa;
+
+      document.getElementById("resultadoFinal").innerHTML = `
+        <strong>Total geral:</strong> R$ ${total.toFixed(2)}
+      `;
     }
 
     function salvarOrcamento() {
@@ -167,7 +187,7 @@
   </script>
 
   <footer>
-    Todos os direitos reservados a <strong>Under.io</strong> · Versão 1.2
+    Todos os direitos reservados a <strong>Under.io</strong> · Versão 1.2.1
   </footer>
 </body>
 </html>
