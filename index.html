@@ -19,8 +19,12 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
       padding: 20px;
     }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
     h2 {
-      text-align: center;
       color: #0078D7;
     }
     label {
@@ -56,15 +60,6 @@
       font-size: 18px;
       line-height: 1.6;
     }
-    .orcamentos-container {
-      display: none;
-      max-width: 540px;
-      margin: auto;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      padding: 20px;
-    }
     footer {
       margin-top: 40px;
       text-align: center;
@@ -75,18 +70,18 @@
 </head>
 <body>
   <div class="container">
-    <h2>Calculadora de Cerâmica</h2>
+    <div class="header">
+      <h2>Calculadora de Cerâmica</h2>
+      <div>
+        <input type="radio" id="ceramica" name="tipoMaterial" value="ceramica" checked>
+        <label for="ceramica">Cerâmica</label>
+        <input type="radio" id="porcelanato" name="tipoMaterial" value="porcelanato">
+        <label for="porcelanato">Porcelanato</label>
+      </div>
+    </div>
 
     <label>ID do Produto:</label>
     <input type="text" id="idProduto" placeholder="Ex: CERAM-456XYZ">
-
-    <label>Tipo de material:</label>
-    <div>
-      <input type="radio" id="ceramica" name="tipoMaterial" value="ceramica" checked>
-      <label for="ceramica">Cerâmica</label>
-      <input type="radio" id="porcelanato" name="tipoMaterial" value="porcelanato">
-      <label for="porcelanato">Porcelanato</label>
-    </div>
 
     <label>Área total (m²):</label>
     <input type="number" id="areaTotal">
@@ -112,11 +107,6 @@
     <button onclick="calcularTotal()">Calcular Total com Argamassa e Rejunte</button>
 
     <div class="resultado" id="resultadoFinal"></div>
-
-    <label>Número do WhatsApp:</label>
-    <input type="text" id="numeroWhatsApp" placeholder="Ex: +55 99999-9999">
-
-    <button onclick="enviarWhatsApp()">Enviar Orçamento pelo WhatsApp</button>
   </div>
 
   <script>
@@ -166,27 +156,39 @@
       const preco5kg = tipoMaterial === "ceramica" ? 59.90 : 91.90;
       const preco1kg = tipoMaterial === "ceramica" ? 14.90 : 23.90;
 
-      const valorRejunte = (sacos5kg * preco5kg) + (sacos1kg * preco1kg);
-      const total = valorArgamassa + valorRejunte;
+      const valorRejunte5kg = sacos5kg * preco5kg;
+      const valorRejunte1kg = sacos1kg * preco1kg;
+      const valorRejunteTotal = valorRejunte5kg + valorRejunte1kg;
+      const total = valorArgamassa + valorRejunteTotal;
+
+      let parcelas = "";
+      if (total >= 400) {
+        for (let i = 1; i <= 10; i++) {
+          let vp = (total / i).toFixed(2);
+          parcelas += `${i}x de R$ ${vp}<br>`;
+        }
+      } else {
+        const minParcela = 40;
+        const nParcelas = Math.floor(total / minParcela) || 1;
+        for (let i = 1; i <= nParcelas; i++) {
+          let vp = (total / i).toFixed(2);
+          parcelas += `${i}x de R$ ${vp}<br>`;
+        }
+      }
 
       document.getElementById("resultadoFinal").innerHTML = `
         <strong>Argamassa:</strong> ${sacosArgamassa} sacos - R$ ${valorArgamassa.toFixed(2)}<br>
         <strong>Rejunte:</strong><br>
-        ${sacos5kg} sacos de 5kg - R$ ${(sacos5kg * preco5kg).toFixed(2)}<br>
-        ${sacos1kg} sacos de 1kg - R$ ${(sacos1kg * preco1kg).toFixed(2)}<br>
-        <strong>Total geral:</strong> R$ ${total.toFixed(2)}
+        ${sacos5kg} sacos de 5kg - R$ ${valorRejunte5kg.toFixed(2)}<br>
+        ${sacos1kg} sacos de 1kg - R$ ${valorRejunte1kg.toFixed(2)}<br>
+        <strong>Total geral:</strong> <span style="font-size: 22px; font-weight: bold; color: red;">R$ ${total.toFixed(2)}</span><br><br>
+        <strong>Parcelamento:</strong><br>${parcelas}
       `;
-    }
-
-    function enviarWhatsApp() {
-      const numero = document.getElementById("numeroWhatsApp").value;
-      const mensagem = encodeURIComponent(document.getElementById("resultadoFinal").innerText);
-      window.open(`https://wa.me/${numero}?text=${mensagem}`, "_blank");
     }
   </script>
 
   <footer>
-    Todos os direitos reservados a <strong>And.io</strong> · Versão 1.9
+    Todos os direitos reservados a <strong>And.io</strong> · Versão 2.0
   </footer>
 </body>
 </html>
