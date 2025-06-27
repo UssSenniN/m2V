@@ -19,8 +19,12 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
       padding: 20px;
     }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
     h2 {
-      text-align: center;
       color: #0078D7;
     }
     label {
@@ -66,7 +70,15 @@
 </head>
 <body>
   <div class="container">
-    <h2>Calculadora de Cerâmica</h2>
+    <div class="header">
+      <h2>Calculadora de Cerâmica</h2>
+      <div>
+        <input type="radio" id="ceramica" name="tipoMaterial" value="ceramica" checked>
+        <label for="ceramica">Cerâmica</label>
+        <input type="radio" id="porcelanato" name="tipoMaterial" value="porcelanato">
+        <label for="porcelanato">Porcelanato</label>
+      </div>
+    </div>
 
     <label>ID do Produto:</label>
     <input type="text" id="idProduto" placeholder="Ex: CERAM-456XYZ">
@@ -94,97 +106,89 @@
 
     <button onclick="calcularTotal()">Calcular Total com Argamassa e Rejunte</button>
 
-    <div class="resultado" id="resultadoFinal"></div><script>
-  let areaComSobraGlobal = 0;
-  let areaAdquiridaGlobal = 0;
+    <div class="resultado" id="resultadoFinal"></div>
+  </div>
 
-  function calcularCeramica() {
-    const area = parseFloat(document.getElementById("areaTotal").value);
-    const areaCaixa = parseFloat(document.getElementById("areaCaixa").value);
-    const valorMetro = parseFloat(document.getElementById("valorMetro").value);
-    const sobra = parseFloat(document.getElementById("margemSobra").value) / 100;
+  <script>
+    function calcularCeramica() {
+      const idProduto = document.getElementById("idProduto").value;
+      const area = parseFloat(document.getElementById("areaTotal").value);
+      const areaCaixa = parseFloat(document.getElementById("areaCaixa").value);
+      const valorMetro = parseFloat(document.getElementById("valorMetro").value);
+      const sobra = parseFloat(document.getElementById("margemSobra").value) / 100;
 
-    if (isNaN(area) || isNaN(areaCaixa) || isNaN(valorMetro)) {
-      document.getElementById("resultadoCeramica").innerHTML = "Preencha os campos obrigatórios.";
-      return;
-    }
-
-    const areaComSobra = area * (1 + sobra);
-    const caixas = Math.ceil(areaComSobra / areaCaixa);
-    const areaRealAdquirida = caixas * areaCaixa;
-    const valorPiso = areaRealAdquirida * valorMetro;
-
-    areaComSobraGlobal = areaComSobra;
-    areaAdquiridaGlobal = areaRealAdquirida;
-
-    document.getElementById("resultadoCeramica").innerHTML = `
-      <strong>Área com sobra:</strong> ${areaComSobra.toFixed(2)} m²<br>
-      <strong>Caixas necessárias:</strong> ${caixas}<br>
-      <strong>Área real adquirida:</strong> ${areaRealAdquirida.toFixed(2)} m²<br>
-      <strong>Valor da cerâmica:</strong> R$ ${valorPiso.toFixed(2)}
-    `;
-  }
-
-  function calcularTotal() {
-    const valorMetro = parseFloat(document.getElementById("valorMetro").value);
-    const precoArgamassa = parseFloat(document.getElementById("argamassaOutro").value) || 0;
-
-    if (!areaAdquiridaGlobal || isNaN(valorMetro) || isNaN(precoArgamassa)) {
-      document.getElementById("resultadoFinal").innerHTML = "Preencha os campos corretamente e calcule primeiro a cerâmica.";
-      return;
-    }
-
-    const valorPiso = areaAdquiridaGlobal * valorMetro;
-
-    // ✔️ Argamassa: divide a área adquirida por 3 e arredonda pra cima
-    const sacosArgamassa = Math.ceil(areaAdquiridaGlobal / 3);
-    const valorArgamassa = sacosArgamassa * precoArgamassa;
-
-    // Rejunte
-    const totalKgRejunte = areaAdquiridaGlobal / 5;
-    const arredondadoKg = totalKgRejunte % 1 >= 0.5
-      ? Math.ceil(totalKgRejunte)
-      : Math.floor(totalKgRejunte);
-    const sacos5kg = Math.floor(arredondadoKg / 5);
-    const restanteKg = arredondadoKg - sacos5kg * 5;
-    const sacos1kg = restanteKg;
-
-    const valorRejunte = (sacos5kg * 59.9) + (sacos1kg * 14.9);
-    const total = valorPiso + valorArgamassa + valorRejunte;
-
-    let parcelas = "";
-    if (total >= 400) {
-      for (let i = 1; i <= 10; i++) {
-        let vp = (total / i).toFixed(2);
-        parcelas += `${i}x de R$ ${vp}<br>`;
+      if (!idProduto || isNaN(area) || isNaN(areaCaixa) || isNaN(valorMetro)) {
+        document.getElementById("resultadoCeramica").innerHTML = "Preencha os campos obrigatórios.";
+        return;
       }
-    } else {
-      const minParcela = 40;
-      const nParcelas = Math.floor(total / minParcela) || 1;
-      for (let i = 1; i <= nParcelas; i++) {
-        let vp = (total / i).toFixed(2);
-        parcelas += `${i}x de R$ ${vp}<br>`;
-      }
+
+      const areaComSobra = area * (1 + sobra);
+      const caixas = Math.ceil(areaComSobra / areaCaixa);
+      const areaRealAdquirida = caixas * areaCaixa;
+      const valorPiso = areaRealAdquirida * valorMetro;
+
+      document.getElementById("resultadoCeramica").innerHTML = `
+        <strong>ID do Produto:</strong> ${idProduto}<br>
+        <strong>Área com sobra:</strong> ${areaComSobra.toFixed(2)} m²<br>
+        <strong>Caixas necessárias:</strong> ${caixas}<br>
+        <strong>Área real adquirida:</strong> ${areaRealAdquirida.toFixed(2)} m²<br>
+        <strong>Valor da cerâmica:</strong> R$ ${valorPiso.toFixed(2)}
+      `;
     }
 
-    document.getElementById("resultadoFinal").innerHTML = `
-      <strong>Argamassa:</strong><br>
-      - Área base: ${areaAdquiridaGlobal.toFixed(2)} m²<br>
-      - Cálculo: ${areaAdquiridaGlobal.toFixed(2)} ÷ 3 = ${Math.ceil(areaAdquiridaGlobal / 3)} sacos<br>
-      - Valor: R$ ${valorArgamassa.toFixed(2)}<br><br>
+    function calcularTotal() {
+      const tipoMaterial = document.querySelector('input[name="tipoMaterial"]:checked').value;
+      const precoArgamassa = parseFloat(document.getElementById("argamassaOutro").value) || 0;
+      const valorMetro = parseFloat(document.getElementById("valorMetro").value);
 
-      <strong>Rejunte:</strong><br>
-      - Estimado: ${totalKgRejunte.toFixed(1)} kg → Arredondado: ${arredondadoKg} kg<br>
-      - Sacos de 5kg: ${sacos5kg}<br>
-      - Sacos de 1kg: ${sacos1kg}<br>
-      - Valor: R$ ${valorRejunte.toFixed(2)}<br><br>
+      if (isNaN(valorMetro) || isNaN(precoArgamassa)) {
+        document.getElementById("resultadoFinal").innerHTML = "Preencha os campos corretamente.";
+        return;
+      }
 
-      <strong>Total geral:</strong> R$ ${total.toFixed(2)}<br><br>
-      <strong>Parcelamento:</strong><br>${parcelas}
-    `;
-  }
-</script>  <footer>
-    Desenvolvido por <strong>Andreilson</strong> · Versão 1.1
+      const sacosArgamassa = Math.ceil(parseFloat(document.getElementById("areaTotal").value) / 3);
+      const valorArgamassa = sacosArgamassa * precoArgamassa;
+
+      const totalKgRejunte = parseFloat(document.getElementById("areaTotal").value) / 5;
+      const sacos5kg = Math.floor(totalKgRejunte / 5);
+      const sacos1kg = Math.ceil(totalKgRejunte % 5);
+
+      const preco5kg = tipoMaterial === "ceramica" ? 59.90 : 91.90;
+      const preco1kg = tipoMaterial === "ceramica" ? 14.90 : 23.90;
+
+      const valorRejunte5kg = sacos5kg * preco5kg;
+      const valorRejunte1kg = sacos1kg * preco1kg;
+      const valorRejunteTotal = valorRejunte5kg + valorRejunte1kg;
+      const total = valorArgamassa + valorRejunteTotal;
+
+      let parcelas = "";
+      if (total >= 400) {
+        for (let i = 1; i <= 10; i++) {
+          let vp = (total / i).toFixed(2);
+          parcelas += `${i}x de R$ ${vp}<br>`;
+        }
+      } else {
+        const minParcela = 40;
+        const nParcelas = Math.floor(total / minParcela) || 1;
+        for (let i = 1; i <= nParcelas; i++) {
+          let vp = (total / i).toFixed(2);
+          parcelas += `${i}x de R$ ${vp}<br>`;
+        }
+      }
+
+      document.getElementById("resultadoFinal").innerHTML = `
+        <strong>Argamassa:</strong> ${sacosArgamassa} sacos - R$ ${valorArgamassa.toFixed(2)}<br>
+        <strong>Rejunte:</strong><br>
+        ${sacos5kg} sacos de 5kg - R$ ${valorRejunte5kg.toFixed(2)}<br>
+        ${sacos1kg} sacos de 1kg - R$ ${valorRejunte1kg.toFixed(2)}<br>
+        <strong>Total geral:</strong> <span style="font-size: 22px; font-weight: bold; color: red;">R$ ${total.toFixed(2)}</span><br><br>
+        <strong>Parcelamento:</strong><br>${parcelas}
+      `;
+    }
+  </script>
+
+  <footer>
+    Todos os direitos reservados a <strong>And.io</strong> · Versão 2.1
   </footer>
 </body>
 </html>
