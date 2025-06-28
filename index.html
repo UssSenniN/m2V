@@ -4,10 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Calculadora de Cerâmica</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -60,14 +57,13 @@
       border-radius: 8px;
       font-size: 18px;
       line-height: 1.6;
-    }    footer {
+    }
+    footer {
       margin-top: 40px;
       text-align: center;
       font-size: 14px;
       color: #666;
     }
-
-    /* 🌙 Estilo do modo escuro */
     body.dark-mode {
       background-color: #1f1f1f;
       color: #e0e0e0;
@@ -90,16 +86,8 @@
   <div class="container">
     <h2>Calculadora de Cerâmica</h2>
 
-    <label>Tipo de Piso:</label>
-    <select id="tipoPiso">
-      <option value="ceramica">Cerâmica</option>
-      <option value="porcelanato">Porcelanato</option>
-    </select>
-
-    <label>ID do Produto:</label>
-    <input type="text" id="idProduto" placeholder="Ex: CERAM-456XYZ">
-
-    <label>Área total (m²):</label>
+    <label>ID do Produto / Nome do Cliente:</label>
+    <input type="text" id="idProduto" placeholder="Ex: CERAM-456XYZ - Maria da Luz">    <label>Área total (m²):</label>
     <input type="number" id="areaTotal">
 
     <label>Área por caixa (m²):</label>
@@ -112,7 +100,6 @@
     <input type="number" id="margemSobra" value="10">
 
     <button onclick="calcularCeramica()">Calcular valor da cerâmica</button>
-
     <div class="resultado" id="resultadoCeramica"></div>
 
     <hr style="margin: 24px 0;">
@@ -121,12 +108,9 @@
     <input type="number" step="0.01" id="argamassaOutro" placeholder="Ex: 32.00">
 
     <button onclick="calcularTotal()">Calcular Total com Argamassa e Rejunte</button>
-
     <div class="resultado" id="resultadoFinal"></div>
 
     <hr style="margin: 24px 0;">
-
-    <canvas id="graficoCustos" width="400" height="260" style="margin-top: 20px;"></canvas>
 
     <label style="margin-top: 20px;">
       <input type="checkbox" id="toggleTema"> Ativar modo escuro
@@ -134,11 +118,11 @@
 
     <button onclick="gerarPDF()">Gerar Orçamento em PDF</button>
     <button onclick="compararMarcas()">Comparar Marcas</button>
+    <button onclick="limparTudo()">Limpar Tudo</button>
 
     <div class="resultado" id="resultadoComparativo"></div><script>
   let areaComSobraGlobal = 0;
   let areaAdquiridaGlobal = 0;
-  let chartInstance = null;
 
   function calcularCeramica() {
     const area = parseFloat(document.getElementById("areaTotal").value);
@@ -168,7 +152,7 @@
   }
 
   function calcularTotal() {
-    const tipo = document.getElementById("tipoPiso").value;
+    const tipo = document.getElementById("tipoPiso")?.value || "ceramica";
     const valorMetro = parseFloat(document.getElementById("valorMetro").value);
     const precoArgamassa = parseFloat(document.getElementById("argamassaOutro").value) || 0;
 
@@ -182,23 +166,16 @@
     const valorArgamassa = sacosArgamassa * precoArgamassa;
 
     const totalKgRejunte = areaAdquiridaGlobal / 5;
-    const arredondadoKg = totalKgRejunte % 1 >= 0.5
-      ? Math.ceil(totalKgRejunte)
-      : Math.floor(totalKgRejunte);
+    const arredondadoKg = totalKgRejunte % 1 >= 0.5 ? Math.ceil(totalKgRejunte) : Math.floor(totalKgRejunte);
     const sacos5kg = Math.floor(arredondadoKg / 5);
     const restanteKg = arredondadoKg - (sacos5kg * 5);
     const sacos1kg = restanteKg;
 
-    let valorRejunte = 0;
-    if (tipo === "ceramica") {
-      valorRejunte = (sacos5kg * 59.90) + (sacos1kg * 14.90);
-    } else {
-      valorRejunte = (sacos5kg * 91.90) + (sacos1kg * 23.90);
-    }
+    let valorRejunte = tipo === "ceramica"
+      ? (sacos5kg * 59.90) + (sacos1kg * 14.90)
+      : (sacos5kg * 91.90) + (sacos1kg * 23.90);
 
     const total = valorPiso + valorArgamassa + valorRejunte;
-
-    atualizarGrafico(valorPiso, valorArgamassa, valorRejunte); // 📊 gráfico
 
     let parcelas = "";
     if (total >= 400) {
@@ -236,7 +213,9 @@
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    const resultado = document.getElementById('resultadoCeramica').innerText + "\n\n" +
+    const cliente = document.getElementById("idProduto").value || "Não informado";
+    const resultado = `ID / Cliente: ${cliente}\n\n` +
+                      document.getElementById('resultadoCeramica').innerText + "\n\n" +
                       document.getElementById('resultadoFinal').innerText;
 
     doc.setFont("helvetica", "normal");
@@ -247,57 +226,43 @@
     doc.save("orcamento-piso.pdf");
   }
 
-  function atualizarGrafico(valorPiso, valorArgamassa, valorRejunte) {
-    const ctx = document.getElementById("graficoCustos").getContext("2d");
-    const data = {
-      labels: ["Cerâmica", "Argamassa", "Rejunte"],
-      datasets: [{
-        label: "Custos (R$)",
-        data: [valorPiso, valorArgamassa, valorRejunte],
-        backgroundColor: ["#0078D7", "#5CBA47", "#FF9F40"]
-      }]
-    };
-
-    if (chartInstance) {
-      chartInstance.data = data;
-      chartInstance.update();
-    } else {
-      chartInstance = new Chart(ctx, {
-        type: "pie",
-        data: data
-      });
-    }
-  }
-
   function compararMarcas() {
-    const valorMetro = parseFloat(document.getElementById("valorMetro").value) || 30;
+    const valorMetro = parseFloat(document.getElementById("valorMetro").value) || 35;
     const area = areaAdquiridaGlobal || 50;
 
     const marcas = [
-      { nome: "Marca A (Premium)", precoPiso: valorMetro * 1.1, precoArgamassa: 42 },
-      { nome: "Marca B (Intermediária)", precoPiso: valorMetro, precoArgamassa: 36 },
-      { nome: "Marca C (Econômica)", precoPiso: valorMetro * 0.85, precoArgamassa: 29 }
+      { nome: "Tupan", precoPiso: 33.90, precoArgamassa: 36.00 },
+      { nome: "Ferreira Costa", precoPiso: 37.90, precoArgamassa: 39.90 },
+      { nome: "Cazanova", precoPiso: 31.99, precoArgamassa: 34.90 }
     ];
 
-    let html = "<strong>Comparativo de Marcas:</strong><br><br>";
+    let html = "<strong>Comparativo de Marcas em Caruaru:</strong><br><br>";
 
     marcas.forEach(marca => {
       const piso = area * marca.precoPiso;
       const argamassa = Math.ceil(area / 3) * marca.precoArgamassa;
-      const rejunte = (area / 5) < 20 ? 250 : 300;
-
+      const rejunte = area < 100 ? 250 : 300;
       const total = piso + argamassa + rejunte;
 
       html += `
         <u>${marca.nome}</u><br>
         - Piso: R$ ${piso.toFixed(2)}<br>
         - Argamassa: R$ ${argamassa.toFixed(2)}<br>
-        - Rejunte (aprox.): R$ ${rejunte.toFixed(2)}<br>
+        - Rejunte (estimado): R$ ${rejunte.toFixed(2)}<br>
         - <strong>Total estimado: R$ ${total.toFixed(2)}</strong><br><br>
       `;
     });
 
     document.getElementById("resultadoComparativo").innerHTML = html;
+  }
+
+  function limparTudo() {
+    document.querySelectorAll("input").forEach(inp => inp.value = "");
+    document.getElementById("resultadoCeramica").innerHTML = "";
+    document.getElementById("resultadoFinal").innerHTML = "";
+    document.getElementById("resultadoComparativo").innerHTML = "";
+    areaAdquiridaGlobal = 0;
+    areaComSobraGlobal = 0;
   }
 
   document.getElementById('toggleTema').addEventListener('change', function () {
@@ -311,7 +276,7 @@
     document.getElementById('toggleTema').checked = escuro;
   });
 </script>    <footer>
-      Desenvolvido por <strong>Andreilson</strong> · Versão 2.0
+      Desenvolvido por <strong>Andreilson</strong> · Versão 2.1
     </footer>
   </div>
 </body>
