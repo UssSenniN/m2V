@@ -227,7 +227,7 @@
 
   const area = areaAdquiridaGlobal.toFixed(2) + " m²";
 
-  // Extrair dados do resultadoFinal
+  // Extração dos dados
   const qtdArgamassa = resultadoFinal.match(/= (\d+) sacos/)?.[1] || "-";
   const valorArgamassa = resultadoFinal.match(/Valor: R\$ ([\d.,]+)/)?.[1] || "-";
 
@@ -236,7 +236,10 @@
 
   const valorPiso = document.getElementById("resultadoCeramica").innerText.match(/Valor da cerâmica:\s*R\$ ([\d.,]+)/)?.[1] || "-";
 
-  // Configuração visual
+  // Parcelas
+  const parcelas = resultadoFinal.split("Parcelamento:")[1]?.trim() || "Sem opções.";
+
+  // Montar conteúdo
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
   doc.text("Orçamento de Piso – m2A", 20, 20);
@@ -249,27 +252,35 @@
     `ID / Cliente: ${cliente}`,
     `Área Real Adquirida: ${area}`,
     `Valor da Cerâmica: R$ ${valorPiso}`,
-    `Quantidade de Argamassa (20kg): ${qtdArgamassa} sacos`,
-    `Valor da Argamassa: R$ ${valorArgamassa}`,
-    `Rejunte 5kg: ${sacos5kg} sacos`,
-    `Rejunte 1kg: ${sacos1kg} sacos`
+    `Argamassa:`,
+    `- Quantidade: ${qtdArgamassa} sacos`,
+    `- Valor: R$ ${valorArgamassa}`,
+    `Rejunte:`,
+    `- 5kg: ${sacos5kg} sacos`,
+    `- 1kg: ${sacos1kg} sacos`,
+    `Opções de Parcelamento:`
   ];
 
   linhas.forEach((linha, index) => {
     doc.text(linha, 20, y + index * 10);
   });
 
+  // Quebra o texto de parcelas em linhas separadas
+  const linhasParcelas = parcelas.split("\n");
+  linhasParcelas.forEach((parc, i) => {
+    doc.text(parc, 28, y + (linhas.length + i) * 10);
+  });
+
   doc.save("orcamento-piso-detalhado.pdf");
 }
-
   function compararMarcas() {
     const valorMetro = parseFloat(document.getElementById("valorMetro").value) || 35;
     const area = areaAdquiridaGlobal || 50;
 
     const marcas = [
-      { nome: "Tupan", precoPiso: 33.90, precoArgamassa: 36.00 },
-      { nome: "Ferreira Costa", precoPiso: 37.90, precoArgamassa: 39.90 },
-      { nome: "Cazanova", precoPiso: 31.99, precoArgamassa: 34.90 }
+      { nome: "Tupan", precoPiso: 33.90, precoArgamassa: 19,49 },
+      { nome: "Ferreira Costa", precoPiso: 37.90, precoArgamassa: 21,90 },
+      { nome: "Cazanova", precoPiso: 31.99, precoArgamassa: 19,99 }
     ];
 
     let html = "<strong>Comparativo de Marcas na região:</strong><br><br>";
