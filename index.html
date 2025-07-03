@@ -18,7 +18,7 @@
     </select>
 
     <label>ID do Produto / Nome do Cliente:</label>
-    <input type="text" id="idProduto" placeholder="Ex: 12345 RAVY">    
+    <input type="text" id="idProduto" placeholder="Ex: 12345 RAVY">
 
     <label>Área total (m²):</label>
     <input type="number" id="areaTotal">
@@ -253,9 +253,7 @@ Parcelamento:
 ${parcelas}`.trim();
 
   salvarDados();
-}
-
-function gerarPDF() {
+}function gerarPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
@@ -268,7 +266,6 @@ function gerarPDF() {
   const sacos5kg = resultadoFinal.match(/Sacos de 5kg: (\d+)/)?.[1] || "0";
   const sacos1kg = resultadoFinal.match(/Sacos de 1kg: (\d+)/)?.[1] || "0";
   const valorPiso = document.getElementById("resultadoCeramica").innerText.match(/Valor da cerâmica:\s*R\$ ([\d.,]+)/)?.[1] || "-";
-
   const parcelas = resultadoFinal.split("Parcelamento:")[1]?.trim() || "Sem opções.";
 
   doc.setFont("helvetica", "bold");
@@ -289,7 +286,7 @@ function gerarPDF() {
     `Rejunte:`,
     `- 5kg: ${sacos5kg} sacos`,
     `- 1kg: ${sacos1kg} sacos`,
-    `Opções de Parcelamento:`
+    `Parcelamento:`
   ];
 
   linhas.forEach((linha, index) => {
@@ -338,17 +335,12 @@ function limparTudo() {
   document.querySelectorAll("input").forEach(inp => inp.value = "");
   document.getElementById("resultadoCeramica").innerHTML = "";
   document.getElementById("resultadoFinal").innerHTML = "";
-  document.getElementById("resultadoComparativofunction limparTudo() {
-  document.querySelectorAll("input").forEach(inp => inp.value = "");
-  document.getElementById("resultadoCeramica").innerHTML = "";
-  document.getElementById("resultadoFinal").innerHTML = "";
   document.getElementById("resultadoComparativo").innerHTML = "";
   areaAdquiridaGlobal = 0;
   areaComSobraGlobal = 0;
   localStorage.removeItem("orcamentoM2A");
 }
 
-// Salvar dados sempre que o usuário altera algo
 document.querySelectorAll("input, select").forEach(el => {
   el.addEventListener("input", salvarDados);
 });
@@ -369,7 +361,6 @@ function salvarDados() {
   localStorage.setItem("orcamentoM2A", JSON.stringify(dados));
 }
 
-// Restaurar dados ao abrir a página
 window.addEventListener("DOMContentLoaded", () => {
   const escuro = localStorage.getItem("temaEscuro") === "1";
   document.body.classList.toggle("dark-mode", escuro);
@@ -391,38 +382,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Alternância de modo escuro
 document.getElementById('toggleTema').addEventListener('change', function () {
   document.body.classList.toggle('dark-mode', this.checked);
   localStorage.setItem('temaEscuro', this.checked ? '1' : '0');
-});<script>
-  // ⬇️ Aqui vem todo o seu JavaScript (funções calcularCeramica, calcularTotal, gerarPDF, etc.)
-  // ... código JavaScript já enviado nas partes anteriores ...
-
-  // Últimas linhas que fecham tudo:
-  document.getElementById('toggleTema').addEventListener('change', function () {
-    document.body.classList.toggle('dark-mode', this.checked);
-    localStorage.setItem('temaEscuro', this.checked ? '1' : '0');
-  });
-
-  window.addEventListener('DOMContentLoaded', () => {
-    const escuro = localStorage.getItem('temaEscuro') === '1';
-    document.body.classList.toggle('dark-mode', escuro);
-    document.getElementById('toggleTema').checked = escuro;
-
-    const salvo = localStorage.getItem('orcamentoM2A');
-    if (salvo) {
-      const dados = JSON.parse(salvo);
-      document.getElementById("tipoPiso").value = dados.tipoPiso || "ceramica";
-      document.getElementById("idProduto").value = dados.idProduto || "";
-      document.getElementById("areaTotal").value = dados.areaTotal || "";
-      document.getElementById("areaCaixa").value = dados.areaCaixa || "";
-      document.getElementById("valorMetro").value = dados.valorMetro || "";
-      document.getElementById("margemSobra").value = dados.margemSobra || "10";
-      document.getElementById("argamassaOutro").value = dados.argamassaOutro || "";
-      document.getElementById("resultadoCeramica").innerHTML = dados.resultadoCeramica || "";
-      document.getElementById("resultadoFinal").innerText = dados.resultadoFinal || "";
-      document.getElementById("resultadoComparativo").innerHTML = dados.resultadoComparativo || "";
-    }
-  });
-</script>
+});
