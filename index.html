@@ -284,6 +284,55 @@
     document.body.classList.toggle('dark-mode', escuro);
     document.getElementById('toggleTema').checked = escuro;
   });
+      // Salvar dados sempre que algum campo mudar
+document.querySelectorAll("input, select").forEach(el => {
+  el.addEventListener("input", salvarDados);
+});
+
+function salvarDados() {
+  const dados = {
+    tipoPiso: document.getElementById("tipoPiso").value,
+    idProduto: document.getElementById("idProduto").value,
+    areaTotal: document.getElementById("areaTotal").value,
+    areaCaixa: document.getElementById("areaCaixa").value,
+    valorMetro: document.getElementById("valorMetro").value,
+    margemSobra: document.getElementById("margemSobra").value,
+    argamassaOutro: document.getElementById("argamassaOutro").value,
+    resultadoCeramica: document.getElementById("resultadoCeramica").innerHTML,
+    resultadoFinal: document.getElementById("resultadoFinal").innerHTML,
+    resultadoComparativo: document.getElementById("resultadoComparativo").innerHTML
+  };
+  localStorage.setItem("orcamentoM2A", JSON.stringify(dados));
+}
+
+// Carregar dados ao abrir a página
+window.addEventListener("DOMContentLoaded", () => {
+  const salvo = localStorage.getItem("orcamentoM2A");
+  if (salvo) {
+    const dados = JSON.parse(salvo);
+    document.getElementById("tipoPiso").value = dados.tipoPiso || "ceramica";
+    document.getElementById("idProduto").value = dados.idProduto || "";
+    document.getElementById("areaTotal").value = dados.areaTotal || "";
+    document.getElementById("areaCaixa").value = dados.areaCaixa || "";
+    document.getElementById("valorMetro").value = dados.valorMetro || "";
+    document.getElementById("margemSobra").value = dados.margemSobra || "10";
+    document.getElementById("argamassaOutro").value = dados.argamassaOutro || "";
+    document.getElementById("resultadoCeramica").innerHTML = dados.resultadoCeramica || "";
+    document.getElementById("resultadoFinal").innerHTML = dados.resultadoFinal || "";
+    document.getElementById("resultadoComparativo").innerHTML = dados.resultadoComparativo || "";
+  }
+});
+
+// Modificar função limparTudo para também apagar localStorage
+function limparTudo() {
+  document.querySelectorAll("input").forEach(inp => inp.value = "");
+  document.getElementById("resultadoCeramica").innerHTML = "";
+  document.getElementById("resultadoFinal").innerHTML = "";
+  document.getElementById("resultadoComparativo").innerHTML = "";
+  areaAdquiridaGlobal = 0;
+  areaComSobraGlobal = 0;
+  localStorage.removeItem("orcamentoM2A"); // <-- zera os dados salvos
+}
 </script>    <footer>
       Desenvolvido por <strong>m2A.Dev</strong> · Versão 2.3
     </footer>
