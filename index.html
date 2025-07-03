@@ -219,21 +219,48 @@
   }
 
   function gerarPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
-    const cliente = document.getElementById("idProduto").value || "Não informado";
-    const resultado = `ID / Cliente: ${cliente}\n\n` +
-                      document.getElementById('resultadoCeramica').innerText + "\n\n" +
-                      document.getElementById('resultadoFinal').innerText;
+  const cliente = document.getElementById("idProduto").value || "Não informado";
+  const resultadoFinal = document.getElementById("resultadoFinal").innerText;
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-    doc.text("Orçamento de Piso", 20, 20);
-    doc.setFontSize(10);
-    doc.text(resultado, 20, 30);
-    doc.save("orcamento-piso.pdf");
-  }
+  const area = areaAdquiridaGlobal.toFixed(2) + " m²";
+
+  // Extrair dados do resultadoFinal
+  const qtdArgamassa = resultadoFinal.match(/= (\d+) sacos/)?.[1] || "-";
+  const valorArgamassa = resultadoFinal.match(/Valor: R\$ ([\d.,]+)/)?.[1] || "-";
+
+  const sacos5kg = resultadoFinal.match(/Sacos de 5kg: (\d+)/)?.[1] || "0";
+  const sacos1kg = resultadoFinal.match(/Sacos de 1kg: (\d+)/)?.[1] || "0";
+
+  const valorPiso = document.getElementById("resultadoCeramica").innerText.match(/Valor da cerâmica:\s*R\$ ([\d.,]+)/)?.[1] || "-";
+
+  // Configuração visual
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.text("Orçamento de Piso – m2A", 20, 20);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(12);
+  let y = 35;
+
+  const linhas = [
+    `ID / Cliente: ${cliente}`,
+    `Área Real Adquirida: ${area}`,
+    `Valor da Cerâmica: R$ ${valorPiso}`,
+    `Quantidade de Argamassa (20kg): ${qtdArgamassa} sacos`,
+    `Valor da Argamassa: R$ ${valorArgamassa}`,
+    `Rejunte 5kg: ${sacos5kg} sacos`,
+    `Rejunte 1kg: ${sacos1kg} sacos`
+  ];
+
+  linhas.forEach((linha, index) => {
+    doc.text(linha, 20, y + index * 10);
+  });
+
+  doc.save("orcamento-piso-detalhado.pdf");
+}
 
   function compararMarcas() {
     const valorMetro = parseFloat(document.getElementById("valorMetro").value) || 35;
@@ -334,7 +361,7 @@ function limparTudo() {
   localStorage.removeItem("orcamentoM2A"); // <-- zera os dados salvos
 }
 </script>    <footer>
-      Desenvolvido por <strong>m2A.Dev</strong> · Versão 2.3
+      Desenvolvido por <strong>m2A.Dev</strong> · Versão 2.4
     </footer>
   </div>
 </body>
