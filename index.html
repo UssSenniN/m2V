@@ -235,36 +235,6 @@
     doc.save("orcamento-piso.pdf");
   }
 
-  function compararMarcas() {
-    const valorMetro = parseFloat(document.getElementById("valorMetro").value) || 35;
-    const area = areaAdquiridaGlobal || 50;
-
-    const marcas = [
-      { nome: "Tupan", precoPiso: 31.90, precoArgamassa: 31.90 },
-      { nome: "Ferreira Costa", precoPiso: 31.90, precoArgamassa: 32.90},
-      { nome: "Cazanova", precoPiso: 31.99, precoArgamassa: 31.99 }
-    ];
-
-    let html = "<strong>Comparativo de Marcas em Caruaru:</strong><br><br>";
-
-    marcas.forEach(marca => {
-      const piso = area * marca.precoPiso;
-      const argamassa = Math.ceil(area / 3) * marca.precoArgamassa;
-      const rejunte = area < 100 ? 250 : 300;
-      const total = piso + argamassa + rejunte;
-
-      html += `
-        <u>${marca.nome}</u><br>
-        - Piso: R$ ${piso.toFixed(2)}<br>
-        - Argamassa: R$ ${argamassa.toFixed(2)}<br>
-        - Rejunte (estimado): R$ ${rejunte.toFixed(2)}<br>
-        - <strong>Total estimado: R$ ${total.toFixed(2)}</strong><br><br>
-      `;
-    });
-
-    document.getElementById("resultadoComparativo").innerHTML = html;
-  }
-
   function limparTudo() {
     document.querySelectorAll("input").forEach(inp => inp.value = "");
     document.getElementById("resultadoCeramica").innerHTML = "";
@@ -285,7 +255,7 @@
     document.getElementById('toggleTema').checked = escuro;
   });
 </script>    <footer>
-      Todos os direitos reservado a <strong>m2A.dev</strong> · Versão 2.2
+      Todos os direitos reservado a <strong>m2A.dev</strong> · Versão 2.3
     </footer>
   </div>
 </body>
