@@ -6,11 +6,11 @@
 **Página publicada**: [usssennin.github.io/m2V](https://usssennin.github.io/m2V)
 
 ## 📌 Descrição
-Sistema desenvolvido para facilitar o cálculo de materiais em obras, com foco em pisos e revestimentos. Permite simular consumo, perdas e estimar custos com base na área informada.
+Sistema desenvolvido para facilitar o cálculo de pisos cerâmicos e porcelanatos, com foco em pisos e revestimentos. Permite simular consumo, perdas e estimar custos com base na área informada.
 
 ## ⚙️ Funcionalidades
 - Cálculo de metragem total
-- Simulação de disposição de peças
+- Simulação de disposição de caixas
 - Estimativa de perdas
 - Cálculo de custo por m²
 
