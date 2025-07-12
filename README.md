@@ -2,7 +2,7 @@
 
 **Autor**: José Andreilson da Silva  
 **Licença**: MIT  
-**Versão**: 1.0  
+**Versão**: 2.3  
 **Página publicada**: [usssennin.github.io/m2V](https://usssennin.github.io/m2V)
 
 ## 📌 Descrição
