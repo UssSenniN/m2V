@@ -162,6 +162,11 @@
     let totalGlobal = 0;
     let parcelaEscolhida = 1;
     let valorParcelaEscolhida = 0;
+    let valorArgamassaGlobal = 0;
+    let valorRejunteGlobal = 0;
+    let sacosArgamassaGlobal = 0;
+    let sacos5kgGlobal = 0;
+    let sacos1kgGlobal = 0;
 
     function calcularCeramica() {
       const area = parseFloat(document.getElementById("areaTotal").value);
@@ -218,6 +223,13 @@
       const total = valorPiso + valorArgamassa + valorRejunte;
       totalGlobal = total;
 
+      // Salva para PDF
+      valorArgamassaGlobal = valorArgamassa;
+      valorRejunteGlobal = valorRejunte;
+      sacosArgamassaGlobal = sacosArgamassa;
+      sacos5kgGlobal = sacos5kg;
+      sacos1kgGlobal = sacos1kg;
+
       // Parcelamento
       let valorParcela = total / parcelas;
       if (valorParcela < 40) {
@@ -230,13 +242,12 @@
         valorParcelaEscolhida = valorParcela;
       }
 
-      // Exibir quantidades de argamassa e rejunte no resultado final
       document.getElementById("resultadoFinal").innerHTML = `
-        <strong>Argamassa:</strong> ${sacosArgamassa} saco(s) de 20kg<br>
+        <strong>Argamassa:</strong> ${sacosArgamassa} saco(s) de 20kg - <strong>R$ ${valorArgamassa.toFixed(2)}</strong><br>
         <strong>Rejunte:</strong> 
           ${sacos5kg > 0 ? sacos5kg + ' saco(s) de 5kg' : ''}
           ${(sacos5kg > 0 && sacos1kg > 0) ? ' e ' : ''}
-          ${sacos1kg > 0 ? sacos1kg + ' saco(s) de 1kg' : ''}<br>
+          ${sacos1kg > 0 ? sacos1kg + ' saco(s) de 1kg' : ''} - <strong>R$ ${valorRejunte.toFixed(2)}</strong><br>
         <strong>Total geral:</strong> R$ ${total.toFixed(2)}<br>
         <strong>Parcelamento escolhido:</strong> ${parcelas}x de R$ ${valorParcela.toFixed(2)} sem juros
       `;
@@ -254,26 +265,18 @@
       const parcelas = parcelaEscolhida;
       const valorParcela = valorParcelaEscolhida;
 
-      // Recuperar quantidades de argamassa e rejunte
-      const valorMetroNum = parseFloat(valorMetro);
-      const sacosArgamassa = Math.ceil(areaAdquiridaGlobal / 3);
-      const totalKgRejunte = areaAdquiridaGlobal / 5;
-      const arredondadoKg = totalKgRejunte % 1 >= 0.5 ? Math.ceil(totalKgRejunte) : Math.floor(totalKgRejunte);
-      const sacos5kg = Math.floor(arredondadoKg / 5);
-      const restanteKg = arredondadoKg - (sacos5kg * 5);
-      const sacos1kg = restanteKg;
-
       let texto = `Orçamento de Piso\n\n`;
       texto += `Cliente/Produto: ${cliente}\n`;
       texto += `Tipo de Piso: ${tipoPiso}\n`;
       texto += `Área Total: ${areaTotal} m²\n`;
-      texto += `Valor do m²: R$ ${valorMetroNum.toFixed(2)}\n`;
-      texto += `Argamassa: ${sacosArgamassa} saco(s) de 20kg\n`;
+      texto += `Valor do m²: R$ ${parseFloat(valorMetro).toFixed(2)}\n`;
+      texto += `Argamassa: ${sacosArgamassaGlobal} saco(s) de 20kg - R$ ${valorArgamassaGlobal.toFixed(2)}\n`;
       texto += `Rejunte: `;
-      if (sacos5kg > 0) texto += `${sacos5kg} saco(s) de 5kg`;
-      if (sacos5kg > 0 && sacos1kg > 0) texto += ' e ';
-      if (sacos1kg > 0) texto += `${sacos1kg} saco(s) de 1kg`;
-      texto += `\n\nTotal: R$ ${total.toFixed(2)}\n`;
+      if (sacos5kgGlobal > 0) texto += `${sacos5kgGlobal} saco(s) de 5kg`;
+      if (sacos5kgGlobal > 0 && sacos1kgGlobal > 0) texto += ' e ';
+      if (sacos1kgGlobal > 0) texto += `${sacos1kgGlobal} saco(s) de 1kg`;
+      texto += ` - R$ ${valorRejunteGlobal.toFixed(2)}\n`;
+      texto += `\nTotal: R$ ${total.toFixed(2)}\n`;
       texto += `Parcelamento: ${parcelas}x de R$ ${valorParcela.toFixed(2)} sem juros`;
 
       doc.setFont("helvetica", "normal");
@@ -292,6 +295,11 @@
       totalGlobal = 0;
       parcelaEscolhida = 1;
       valorParcelaEscolhida = 0;
+      valorArgamassaGlobal = 0;
+      valorRejunteGlobal = 0;
+      sacosArgamassaGlobal = 0;
+      sacos5kgGlobal = 0;
+      sacos1kgGlobal = 0;
       document.getElementById("parcelasSelect").value = "1";
     }
 
